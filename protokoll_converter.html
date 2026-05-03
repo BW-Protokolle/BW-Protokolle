@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KP & FSP Protokoll Konverter — OUSS Medizin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#ffffff; --surface:#f7f5f2; --surface2:#eeecea; --surface3:#e8e5e1;
+  --border:#e5e2de; --border2:#d8d5d0;
+  --text:#1a1410; --text2:#6b6460; --text3:#a09890;
+  --red:#c8303a; --red-bg:#fdf2f2; --red-border:#fbd5d5;
+  --blue:#2563eb; --blue-bg:#eff6ff; --blue-border:#bfdbfe;
+  --green:#0f7b5a; --green-bg:#f0fdf8; --green-border:#a7f3d0;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#ddd6fe;
+  --kp-accent:#c8303a;
+  --fsp-accent:#7c3aed;
+  --accent:#c8303a;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --r:10px; --r-lg:14px;
+  --shadow:0 2px 8px rgba(0,0,0,.06);
+  --shadow-md:0 6px 24px rgba(0,0,0,.09);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.75;overflow-x:hidden;transition:--accent .2s}
+a{color:var(--blue);text-decoration:none}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;height:54px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 2rem;gap:10px}
+.nav-brand{font-family:var(--serif);font-size:1.1rem;font-weight:400;color:var(--text);display:flex;align-items:center;gap:.4rem}
+.nav-brand-heart{animation:hb 1.6s ease-in-out infinite;display:inline-block}
+@keyframes hb{0%,100%{transform:scale(1)}14%{transform:scale(1.2)}28%{transform:scale(1)}42%{transform:scale(1.1)}56%{transform:scale(1)}}
+.nav-spacer{flex:1}
+.nav-badge{font-size:.74rem;font-weight:700;padding:5px 12px;background:var(--accent);color:#fff;border-radius:7px;transition:background .3s}
+.nav-home{font-size:.8rem;color:var(--text2);padding:5px 10px;border-radius:7px;border:1px solid var(--border);transition:background .15s}
+.nav-home:hover{background:var(--surface);color:var(--text)}
+
+/* MODE SWITCHER */
+.mode-bar{background:var(--surface);border-bottom:2px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;gap:12px}
+.mode-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.mode-btn{display:inline-flex;align-items:center;gap:7px;padding:.55rem 1.3rem;border-radius:8px;border:2px solid var(--border);background:var(--bg);color:var(--text2);font-family:var(--sans);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.mode-btn:hover{background:var(--surface2)}
+.mode-btn.active-kp{border-color:var(--kp-accent);background:var(--red-bg);color:var(--kp-accent)}
+.mode-btn.active-fsp{border-color:var(--fsp-accent);background:var(--purple-bg);color:var(--fsp-accent)}
+.mode-sep{width:1px;height:28px;background:var(--border);margin:0 4px}
+
+/* MAIN */
+.container{max-width:1280px;margin:0 auto;padding:2rem 2rem 5rem}
+.page-header{margin-bottom:1.8rem;padding-bottom:1.4rem;border-bottom:1px solid var(--border)}
+.page-icon{font-size:2.6rem;line-height:1;margin-bottom:.5rem}
+.page-title{font-family:var(--serif);font-size:clamp(1.7rem,2.8vw,2.4rem);font-weight:300;line-height:1.15;margin-bottom:.45rem}
+.page-title em{font-style:italic;color:var(--accent);transition:color .3s}
+.page-desc{font-size:.87rem;color:var(--text2);max-width:700px;line-height:1.75}
+
+/* TWO COLUMN */
+.workspace{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:960px){.workspace{grid-template-columns:1fr}}
+
+/* PANELS */
+.panel{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.panel-header{background:var(--surface);border-bottom:1px solid var(--border);padding:.7rem 1.2rem;display:flex;align-items:center;gap:8px}
+.panel-title{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
+.panel-body{padding:1.2rem}
+
+/* FORM */
+.field-label{display:block;font-size:.74rem;font-weight:600;color:var(--text2);margin-bottom:.35rem;letter-spacing:.04em}
+.field-hint{font-size:.71rem;color:var(--text3);margin-top:.22rem}
+textarea,.code-out{
+  width:100%;border:1px solid var(--border2);border-radius:var(--r);
+  font-family:'Courier New',monospace;font-size:.79rem;line-height:1.6;
+  background:var(--surface);color:var(--text);
+  padding:.75rem 1rem;resize:vertical;outline:none;
+  transition:border-color .15s;
+}
+textarea{min-height:260px}
+.code-out{min-height:260px;white-space:pre;overflow:auto;display:block;tab-size:2}
+textarea:focus{border-color:var(--accent)}
+input[type=text],select{
+  width:100%;padding:.42rem .72rem;border:1px solid var(--border2);border-radius:8px;
+  font-family:var(--sans);font-size:.82rem;color:var(--text);background:var(--bg);outline:none;
+  transition:border-color .15s;
+}
+input[type=text]:focus,select:focus{border-color:var(--accent)}
+select{cursor:pointer}
+
+/* META GRIDS */
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:.85rem}
+.meta-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:.85rem}
+.meta-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px;margin-bottom:.85rem}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:.9rem}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:.55rem 1.1rem;border-radius:8px;font-family:var(--sans);font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15);transition:background .3s,box-shadow .15s}
+.btn-primary:hover{filter:brightness(.9)}
+.btn-secondary{background:var(--surface);color:var(--text2);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface2);color:var(--text)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#0a6349}
+.btn-sm{padding:.38rem .75rem;font-size:.75rem}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:.85rem 0}
+
+/* DETECT BADGES */
+.detect-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.75rem;min-height:20px}
+.detect-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700;border:1px solid}
+.detect-badge.ok{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.detect-badge.warn{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+
+/* INFO BOX */
+.info-box{border-radius:var(--r);padding:.85rem 1.1rem;font-size:.82rem;color:var(--text);line-height:1.7;margin-bottom:.9rem;border:1px solid}
+.info-box.blue{background:var(--blue-bg);border-color:var(--blue-border)}
+.info-box.red{background:var(--red-bg);border-color:var(--red-border)}
+.info-box.purple{background:var(--purple-bg);border-color:var(--purple-border)}
+
+/* MODE SECTIONS */
+.kp-only,.fsp-only{transition:opacity .2s}
+.kp-only.hidden,.fsp-only.hidden{display:none}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1410;color:#fff;padding:.65rem 1.15rem;border-radius:10px;font-size:.82rem;font-weight:600;opacity:0;transform:translateY(12px);transition:all .25s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* PREVIEW */
+.preview-section{margin-top:1.8rem;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.preview-header{background:var(--surface);border-bottom:1px solid var(--border);padding:.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between}
+.preview-title{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
+#preview-container{padding:1rem;display:none}
+
+/* ── SHARED PROTOCOL PREVIEW STYLES (mirrors both KP and FSP pages) ── */
+#preview-container .protocol-entry{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);margin-bottom:.5rem}
+#preview-container .protocol-header{display:flex;align-items:center;gap:10px;padding:.85rem 1.2rem;background:var(--surface);border-bottom:1px solid var(--border)}
+#preview-container .protocol-date{font-family:var(--serif);font-size:1rem;color:var(--text);font-weight:400;flex:1}
+#preview-container .protocol-badges{display:flex;gap:5px;flex-wrap:wrap}
+#preview-container .protocol-toggle{color:var(--text3);font-size:.7rem;margin-left:6px}
+#preview-container .protocol-body{padding:1.2rem 1.4rem;display:block}
+#preview-container .protocol-body p{font-size:.9rem;line-height:1.75;margin-bottom:.55rem}
+#preview-container .protocol-body ul,#preview-container .protocol-body ol{padding-left:1.5rem;margin-bottom:.55rem}
+#preview-container .protocol-body li{font-size:.9rem;line-height:1.7;margin-bottom:.15rem}
+#preview-container .protocol-body h3{font-size:1rem;font-weight:600;margin:1.2rem 0 .5rem;color:var(--text)}
+#preview-container .protocol-body hr{border:none;border-top:1px solid var(--border);margin:1rem 0}
+#preview-container .protocol-body strong{font-weight:600}
+#preview-container .tag{padding:3px 11px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid;display:inline-flex;align-items:center;gap:4px}
+#preview-container .tag.red{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+#preview-container .tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+#preview-container .tag.gray{background:var(--surface2);color:var(--text2);border-color:var(--border)}
+#preview-container .new-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;background:#dcfce7;color:#166534;border:1px solid #86efac}
+
+/* FORMATTING TABLE */
+.fmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;font-size:.81rem;color:var(--text2);line-height:1.65}
+code{font-family:'Courier New',monospace;font-size:.82em;background:var(--surface2);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand"><span class="nav-brand-heart">🩺</span> OUSS Medizin</div>
+  <div class="nav-spacer"></div>
+  <a href="index.html" class="nav-home">🏠 Zurück</a>
+  <span class="nav-badge" id="navBadge">KP Protokoll Konverter</span>
+</nav>
+
+<!-- MODE SWITCHER -->
+<div class="mode-bar">
+  <span class="mode-label">Modus:</span>
+  <button class="mode-btn active-kp" id="btnKP" onclick="setMode('kp')">🏥 Kenntnisprüfung (KP)</button>
+  <div class="mode-sep"></div>
+  <button class="mode-btn" id="btnFSP" onclick="setMode('fsp')">🗣️ Fachsprachprüfung (FSP)</button>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <div class="page-header">
+    <div class="page-icon" id="pageIcon">🏥</div>
+    <h1 class="page-title" id="pageTitle">KP & FSP Protokoll <em id="pageTitleEm">Konverter</em></h1>
+    <p class="page-desc" id="pageDesc">
+      Text aus Telegram einfügen → fertigen HTML-Code für die Protokollseiten erhalten. Wähle oben den Prüfungstyp. Der Inhalt wird <strong>nicht verändert</strong> — nur Formatierung wird angepasst.
+    </p>
+  </div>
+
+  <div class="workspace">
+
+    <!-- ════ LEFT: INPUT ════ -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>📋</span>
+          <span class="panel-title">Eingabe · Roher Telegram-Text</span>
+        </div>
+        <div class="panel-body">
+
+          <div class="info-box blue" id="infoBox">
+            <strong>KP-Modus:</strong> Text aus Telegram einfügen. Datum und Ergebnis werden automatisch erkannt. Für mehrere Protokolle am gleichen Tag das Suffix nutzen (z. B. -1, -2, -3).
+          </div>
+
+          <!-- AUTO-DETECT BADGES -->
+          <div class="detect-row" id="detectRow"></div>
+
+          <!-- ── KP META FIELDS ── -->
+          <div id="kpFields">
+            <div class="meta-grid-4">
+              <div>
+                <label class="field-label">📅 Datum</label>
+                <input type="text" id="kpDate" placeholder="30.04.2026">
+              </div>
+              <div>
+                <label class="field-label">🔢 Suffix</label>
+                <input type="text" id="kpSuffix" placeholder="-1 (optional)">
+              </div>
+              <div>
+                <label class="field-label">🏥 Stadt</label>
+                <select id="kpCity">
+                  <option value="heidelberg">Heidelberg</option>
+                  <option value="stuttgart">Stuttgart</option>
+                  <option value="mannheim">Mannheim</option>
+                  <option value="freiburg">Freiburg</option>
+                  <option value="ulm">Ulm</option>
+                  <option value="tuebingen">Tübingen</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">📋 Ergebnis</label>
+                <select id="kpResult">
+                  <option value="green">✓ Bestanden</option>
+                  <option value="red">✗ Nicht bestanden</option>
+                  <option value="none">Kein Ergebnis</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── FSP META FIELDS ── -->
+          <div id="fspFields" class="hidden">
+            <div class="meta-grid">
+              <div>
+                <label class="field-label">📅 Datum</label>
+                <input type="text" id="fspDate" placeholder="22.03.2025">
+              </div>
+              <div>
+                <label class="field-label">🏥 Diagnose</label>
+                <input type="text" id="fspDiag" placeholder="z. B. Multiple Sklerose">
+              </div>
+            </div>
+            <div class="meta-grid-3">
+              <div>
+                <label class="field-label">🏙️ Stadt</label>
+                <select id="fspCity">
+                  <option value="stuttgart">Stuttgart</option>
+                  <option value="karlsruhe">Karlsruhe</option>
+                  <option value="freiburg">Freiburg</option>
+                  <option value="reutlingen">Reutlingen</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">📋 Ergebnis</label>
+                <select id="fspResult">
+                  <option value="green">✓ bestanden</option>
+                  <option value="red">✗ nicht bestanden</option>
+                  <option value="none">Kein Ergebnis</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">🆕 Neu-Badge</label>
+                <select id="fspNew">
+                  <option value="yes">Ja — 🆕 Neu</option>
+                  <option value="no">Nein</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- TEXT INPUT -->
+          <label class="field-label">✍️ Protokoll-Text</label>
+          <textarea id="inputText" placeholder="Hier den rohen Text aus Telegram einfügen …" oninput="autoDetect()"></textarea>
+          <div class="field-hint">Inhalt wird nicht verändert — nur Formatierung (Absätze, Listen, Fettschrift) wird angepasst.</div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" id="convertBtn" onclick="convert()">⚡ Konvertieren</button>
+            <button class="btn btn-secondary" onclick="clearAll()">🗑️ Leeren</button>
+            <button class="btn btn-secondary btn-sm" onclick="loadExample()">📄 Beispiel laden</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ RIGHT: OUTPUT ════ -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>💻</span>
+          <span class="panel-title">Ausgabe · Fertiger HTML-Code</span>
+        </div>
+        <div class="panel-body">
+          <label class="field-label">HTML-Code (direkt in die Protokollseite einfügen)</label>
+          <code class="code-out" id="outputCode"><!-- Hier erscheint der generierte HTML-Code --></code>
+          <div class="btn-row">
+            <button class="btn btn-green" onclick="copyCode()">📋 HTML kopieren</button>
+            <button class="btn btn-secondary" onclick="togglePreview()">👁️ Vorschau</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR NAV SNIPPET -->
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-header">
+          <span>🔗</span>
+          <span class="panel-title" id="navPanelTitle">Sidebar-Link (für #sidebarDates)</span>
+        </div>
+        <div class="panel-body">
+          <code class="code-out" id="outputNav" style="min-height:auto;padding:.6rem 1rem;font-size:.79rem"></code>
+          <div class="field-hint" id="navHint">In die Sidebar-Navigation der passenden KP-Datei einfügen, vor dem vorherigen Datum.</div>
+          <div class="btn-row">
+            <button class="btn btn-secondary btn-sm" onclick="copyNav()">📋 Link kopieren</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-section" id="previewSection" style="display:none">
+    <div class="preview-header">
+      <span class="preview-title">👁️ Vorschau — so sieht es auf der Seite aus</span>
+      <button class="btn btn-secondary btn-sm" onclick="togglePreview()">✕ Schließen</button>
+    </div>
+    <div id="preview-container"></div>
+  </div>
+
+  <!-- FORMATTING RULES -->
+  <div style="margin-top:1.8rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.3rem">
+    <div style="font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.9rem">📖 Automatische Formatierungsregeln</div>
+    <div class="fmt-grid">
+      <div><strong style="color:var(--text)">Absätze:</strong> Leerzeilen → <code>&lt;p&gt;</code> Blöcke</div>
+      <div><strong style="color:var(--text)">Listen:</strong> Zeilen mit <code>-</code> <code>•</code> <code>*</code> oder <code>1.</code> → <code>&lt;ul&gt;&lt;li&gt;</code></div>
+      <div><strong style="color:var(--text)">Fett:</strong> <code>**text**</code> oder <code>__text__</code> → <code>&lt;strong&gt;</code></div>
+      <div><strong style="color:var(--text)">Labels:</strong> <code>VD:</code> <code>DD:</code> <code>Anamnese:</code> usw. → automatisch fett</div>
+      <div><strong style="color:var(--text)">KP Suffix:</strong> <code>-1</code> <code>-2</code> für mehrere Protokolle am selben Tag</div>
+      <div><strong style="color:var(--text)">Sonderzeichen:</strong> <code>&lt;</code> <code>&gt;</code> <code>&amp;</code> werden korrekt escaped</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let mode = 'kp'; // 'kp' | 'fsp'
+
+// ─── MODE SWITCHER ──────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  const isKP = m === 'kp';
+
+  // Buttons
+  document.getElementById('btnKP').className  = 'mode-btn' + (isKP ? ' active-kp'  : '');
+  document.getElementById('btnFSP').className = 'mode-btn' + (!isKP ? ' active-fsp' : '');
+
+  // Fields
+  document.getElementById('kpFields').classList.toggle('hidden', !isKP);
+  document.getElementById('fspFields').classList.toggle('hidden', isKP);
+
+  // Accent color (CSS variable swap via class)
+  document.documentElement.style.setProperty('--accent', isKP ? 'var(--kp-accent)' : 'var(--fsp-accent)');
+
+  // Nav badge
+  document.getElementById('navBadge').textContent = isKP ? 'KP Protokoll Konverter' : 'FSP Protokoll Konverter';
+  document.getElementById('navBadge').style.background = isKP ? 'var(--kp-accent)' : 'var(--fsp-accent)';
+
+  // Page copy
+  document.getElementById('pageIcon').textContent = isKP ? '🏥' : '🗣️';
+
+  // Info box
+  const box = document.getElementById('infoBox');
+  if (isKP) {
+    box.className = 'info-box red';
+    box.innerHTML = '<strong>KP-Modus:</strong> Kenntnisprüfung. Text aus Telegram einfügen. Datum und Ergebnis werden automatisch erkannt. Für mehrere Protokolle am gleichen Tag das Suffix nutzen (z. B. -1, -2, -3).';
+  } else {
+    box.className = 'info-box purple';
+    box.innerHTML = '<strong>FSP-Modus:</strong> Fachsprachprüfung. Datum, Diagnose und Ergebnis werden automatisch erkannt. Der Neu-Badge <code>🆕 Neu</code> kann optional hinzugefügt werden.';
+  }
+
+  // Sidebar hint
+  document.getElementById('navHint').textContent = isKP
+    ? 'In die Sidebar-Navigation der KP-Datei einfügen, chronologisch vor dem vorherigen Datum.'
+    : 'In die Sidebar-Navigation der FSP-Datei einfügen.';
+  document.getElementById('navPanelTitle').textContent = isKP
+    ? 'Sidebar-Link KP (für #sidebarDates)'
+    : 'Sidebar-Link FSP (für #sidebarDates)';
+
+  autoDetect();
+}
+
+// ─── HELPERS ────────────────────────────────────────────────────────────────
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function makeIdKP(date, suffix) {
+  // date "30.04.2026" + suffix "-1" → "p-300420261"
+  const clean = date.replace(/\./g,'').replace(/[^0-9]/g,'');
+  const sfx   = suffix.replace(/[^0-9]/g,'');
+  return 'p-' + clean + sfx;
+}
+
+function makeIdFSP(date, diag) {
+  return 'p-' + (date + diag)
+    .toLowerCase()
+    .replace(/[äÄ]/g,'ae').replace(/[öÖ]/g,'oe').replace(/[üÜ]/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9]/g,'');
+}
+
+function showToast(msg, dur=2200) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+const KP_CITIES = {
+  heidelberg:'Heidelberg', stuttgart:'Stuttgart', mannheim:'Mannheim',
+  freiburg:'Freiburg', ulm:'Ulm', tuebingen:'Tübingen'
+};
+const FSP_CITIES = {
+  stuttgart:'Stuttgart', karlsruhe:'Karlsruhe', freiburg:'Freiburg', reutlingen:'Reutlingen'
+};
+
+// ─── AUTO-DETECT ─────────────────────────────────────────────────────────────
+function autoDetect() {
+  const raw = document.getElementById('inputText').value;
+  const row = document.getElementById('detectRow');
+  row.innerHTML = '';
+  if (!raw.trim()) return;
+
+  const badges = [];
+
+  // Date
+  const dateM = raw.match(/\b(\d{1,2}\.\d{1,2}\.\d{4})\b/);
+  if (dateM) {
+    if (mode === 'kp') document.getElementById('kpDate').value = dateM[1];
+    else              document.getElementById('fspDate').value = dateM[1];
+    badges.push(['📅 ' + dateM[1], 'ok']);
+  }
+
+  // Result
+  if (/nicht\s+bestanden/i.test(raw)) {
+    if (mode === 'kp') document.getElementById('kpResult').value = 'red';
+    else              document.getElementById('fspResult').value = 'red';
+    badges.push(['✗ nicht bestanden', 'warn']);
+  } else if (/bestanden/i.test(raw)) {
+    if (mode === 'kp') document.getElementById('kpResult').value = 'green';
+    else              document.getElementById('fspResult').value = 'green';
+    badges.push(['✓ bestanden', 'ok']);
+  }
+
+  // City
+  const kpCityMap = [
+    [/\bheidelberg\b/i,'heidelberg'],[/\bstuttgart\b/i,'stuttgart'],
+    [/\bmannheim\b/i,'mannheim'],[/\bfreiburg\b/i,'freiburg'],
+    [/\bulm\b/i,'ulm'],[/\bt[üu]bingen\b/i,'tuebingen'],
+  ];
+  const fspCityMap = [
+    [/\bstuttgart\b/i,'stuttgart'],[/\bkarlsruhe\b/i,'karlsruhe'],
+    [/\bfreiburg\b/i,'freiburg'],[/\breutlingen\b/i,'reutlingen'],
+  ];
+  const cityMap = mode === 'kp' ? kpCityMap : fspCityMap;
+  const cityEl  = mode === 'kp' ? 'kpCity' : 'fspCity';
+  const cities  = mode === 'kp' ? KP_CITIES : FSP_CITIES;
+  for (const [re, val] of cityMap) {
+    if (re.test(raw)) {
+      document.getElementById(cityEl).value = val;
+      badges.push(['🏙️ ' + cities[val], 'ok']);
+      break;
+    }
+  }
+
+  // FSP only: diagnose
+  if (mode === 'fsp') {
+    const diagPatterns = [
+      /Fall:\s*([^\n]+)/i, /Diagnose:\s*([^\n]+)/i,
+      /VD:\s*([^\n]+)/i,   /V\.?\s*a\.?\s*([^\n]+)/i,
+    ];
+    for (const re of diagPatterns) {
+      const m = raw.match(re);
+      if (m && m[1].trim().length > 1 && m[1].trim().length < 80) {
+        const diag = m[1].trim().replace(/\*+/g,'').replace(/^[:\-–\s]+/,'').trim();
+        if (diag) { document.getElementById('fspDiag').value = diag; badges.push(['🏥 ' + diag, 'ok']); break; }
+      }
+    }
+  }
+
+  // KP only: detect suffix hints (Teil 1/2/3 pattern → multiple candidates)
+  if (mode === 'kp') {
+    const multiM = raw.match(/(\d+)\s*\/\s*(\d+)/); // e.g. "3/4 candidates"
+    if (multiM) badges.push(['👥 ' + multiM[0], 'ok']);
+  }
+
+  badges.forEach(([txt, cls]) => {
+    const el = document.createElement('span');
+    el.className = 'detect-badge ' + cls;
+    el.textContent = txt;
+    row.appendChild(el);
+  });
+}
+
+// ─── TEXT → HTML BODY ────────────────────────────────────────────────────────
+function convertBody(raw) {
+  let text = raw.replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim();
+  const rawLines = text.split('\n');
+  const result = [];
+  let listItems = [], paraLines = [];
+
+  function flushList() {
+    if (!listItems.length) return;
+    result.push('<ul>');
+    for (const li of listItems) result.push('  <li>' + li + '</li>');
+    result.push('</ul>');
+    listItems = [];
+  }
+  function flushPara() {
+    if (!paraLines.length) return;
+    const joined = paraLines.join(' ').trim();
+    if (joined) result.push('<p>' + joined + '</p>');
+    paraLines = [];
+  }
+
+  function formatInline(s) {
+    s = esc(s);
+    // **bold**
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    // Label: "Key:" at start of string → bold
+    s = s.replace(/^(<strong>[^<]+<\/strong>|[A-ZÄÖÜ][a-zA-ZÄÖÜäöüß\/\- ]{1,30}):(\s*)/, '<strong>$1:</strong>$2');
+    return s;
+  }
+
+  const SECTION_KEYS = /^(VD|DD|Verdachtsdiagnose|Diagnose|Fall|Patient(in)?|Anamnese|Vorerkrankungen|Medikamente|Allergien|Noxen|Sozialanamnese|Familienanamnese|Vegetative\s+Anamnese|Fachbegriffe|Vorgehen|Therapie|Maßnahmen|Diagnostik|AAG[- ]Fragen?|Körperliche\s+Untersuchung|KU|Labor|Bildgebung|Prüfungskommission|Kommission|Hinweis|Besonderheit|Tipp|Empfehlung|Teil\s+\d|Internist(in)?|Chirurg(in)?|Radiologe?|Anästhesist(in)?|Notfallmedizin|Kardiologie|Neurologie)[:\-–]/i;
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const line    = rawLines[i];
+    const trimmed = line.trim();
+
+    if (!trimmed) { flushList(); flushPara(); continue; }
+
+    // List item
+    if (/^[-•*]\s+/.test(trimmed) || /^\d+[.)]\s+/.test(trimmed)) {
+      flushPara();
+      const content = trimmed.replace(/^[-•*\d.)\s]+/, '').trim();
+      listItems.push(formatInline(content));
+      continue;
+    }
+
+    // Section heading
+    if (SECTION_KEYS.test(trimmed)) {
+      flushList(); flushPara();
+      result.push('<p>' + formatInline(trimmed) + '</p>');
+      continue;
+    }
+
+    // Regular line
+    flushList();
+    paraLines.push(formatInline(trimmed));
+  }
+  flushList(); flushPara();
+  return result.join('\n');
+}
+
+// ─── MAIN CONVERT ────────────────────────────────────────────────────────────
+function convert() {
+  const raw = document.getElementById('inputText').value.trim();
+  if (!raw) { showToast('⚠️ Bitte zuerst einen Text eingeben.'); return; }
+
+  if (mode === 'kp') convertKP(raw);
+  else               convertFSP(raw);
+}
+
+function convertKP(raw) {
+  const date   = document.getElementById('kpDate').value.trim()   || 'xx.xx.xxxx';
+  const suffix = document.getElementById('kpSuffix').value.trim() || '';
+  const city   = document.getElementById('kpCity').value;
+  const result = document.getElementById('kpResult').value;
+
+  const id = makeIdKP(date, suffix);
+  const dateLabel = date + (suffix ? suffix : '');
+
+  const resultBadge = result === 'green'
+    ? `<span class="tag green">✓ Bestanden</span>`
+    : result === 'red'
+    ? `<span class="tag red">✗ Nicht bestanden</span>`
+    : '';
+
+  const bodyHtml = convertBody(raw);
+  const bodyIndented = bodyHtml.split('\n').map(l => '  ' + l).join('\n');
+
+  const html =
+`<section id="${id}" class="protocol-entry fade-in">
+  <div class="protocol-header">
+    <div class="protocol-date">📅 ${esc(dateLabel)}</div>
+    <div class="protocol-badges">${resultBadge}</div>
+    <span class="protocol-toggle">▶</span>
+  </div>
+  <div class="protocol-body">
+${bodyIndented}
+  </div>
+</section>`;
+
+  document.getElementById('outputCode').textContent = html;
+
+  // Sidebar nav link (KP format)
+  const resultSpan = result === 'green'
+    ? ` <span style="color:var(--green);font-size:.75rem">✓</span>`
+    : result === 'red'
+    ? ` <span style="color:var(--red);font-size:.75rem">✗</span>`
+    : '';
+
+  const navHtml = `<a href="#${id}">${esc(dateLabel)}${resultSpan}</a>`;
+  document.getElementById('outputNav').textContent = navHtml;
+
+  maybeUpdatePreview(html);
+  showToast('✅ KP-Protokoll konvertiert!');
+}
+
+function convertFSP(raw) {
+  const date   = document.getElementById('fspDate').value.trim()   || 'xx.xx.xxxx';
+  const diag   = document.getElementById('fspDiag').value.trim()   || 'Unbekannte Diagnose';
+  const city   = document.getElementById('fspCity').value;
+  const result = document.getElementById('fspResult').value;
+  const showNew= document.getElementById('fspNew').value === 'yes';
+
+  const id = makeIdFSP(date, diag);
+  const cityLabel = FSP_CITIES[city] || city;
+
+  const resultBadge = result === 'green'
+    ? `<span class="tag green" style="font-size:.72rem">✓ bestanden</span>`
+    : result === 'red'
+    ? `<span class="tag red" style="font-size:.72rem">✗ nicht bestanden</span>`
+    : '';
+
+  const cityBadge  = `<span class="tag gray" style="font-size:.67rem">🏙️ ${esc(cityLabel)}</span>`;
+  const newBadge   = showNew ? `<span class="new-badge">🆕 Neu</span>` : '';
+  const dateLabel  = date.startsWith('xx') ? diag : `${date} ${diag}`;
+
+  const bodyHtml = convertBody(raw);
+  const bodyIndented = bodyHtml.split('\n').map(l => '    ' + l).join('\n');
+
+  const html =
+`<section id="${id}" class="protocol-entry fade-in" data-hosp="${city}">
+  <div class="protocol-header">
+    <div class="protocol-date">📅 ${esc(dateLabel)}</div>
+    <div class="protocol-badges">${resultBadge}${cityBadge}${newBadge}</div>
+    <span class="protocol-toggle">▶</span>
+  </div>
+  <div class="protocol-body">
+${bodyIndented}
+    <hr>
+  </div>
+</section>`;
+
+  document.getElementById('outputCode').textContent = html;
+
+  // Sidebar nav link (FSP format)
+  const navLabel = date.startsWith('xx') ? diag : `${date} ${esc(diag)}`;
+  const navHtml  = `<a href="#${id}">${navLabel}</a>`;
+  document.getElementById('outputNav').textContent = navHtml;
+
+  maybeUpdatePreview(html);
+  showToast('✅ FSP-Protokoll konvertiert!');
+}
+
+// ─── PREVIEW ─────────────────────────────────────────────────────────────────
+function maybeUpdatePreview(html) {
+  const section = document.getElementById('previewSection');
+  if (section.style.display !== 'none') renderPreview(html);
+}
+
+function renderPreview(html) {
+  const container = document.getElementById('preview-container');
+  container.innerHTML = html;
+  container.style.display = 'block';
+  container.querySelectorAll('.protocol-body').forEach(b => b.style.display = 'block');
+}
+
+function togglePreview() {
+  const section = document.getElementById('previewSection');
+  const html    = document.getElementById('outputCode').textContent.trim();
+  if (!html || html.startsWith('<!--')) { showToast('⚠️ Zuerst konvertieren!'); return; }
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    renderPreview(html);
+    section.scrollIntoView({ behavior:'smooth', block:'start' });
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+// ─── COPY ────────────────────────────────────────────────────────────────────
+function copyText(id, label) {
+  const code = document.getElementById(id).textContent;
+  if (!code || code.startsWith('<!--')) { showToast('⚠️ Zuerst konvertieren!'); return; }
+  navigator.clipboard.writeText(code)
+    .then(() => showToast('✅ ' + label + ' kopiert!'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = code; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      showToast('✅ ' + label + ' kopiert!');
+    });
+}
+function copyCode() { copyText('outputCode', 'HTML-Code'); }
+function copyNav()  { copyText('outputNav',  'Nav-Link'); }
+
+// ─── CLEAR ───────────────────────────────────────────────────────────────────
+function clearAll() {
+  document.getElementById('inputText').value = '';
+  ['kpDate','kpSuffix','fspDate','fspDiag'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('outputCode').textContent = '<!-- Hier erscheint der generierte HTML-Code -->';
+  document.getElementById('outputNav').textContent  = '';
+  document.getElementById('detectRow').innerHTML    = '';
+  document.getElementById('previewSection').style.display = 'none';
+}
+
+// ─── EXAMPLES ────────────────────────────────────────────────────────────────
+const EXAMPLES = {
+  kp: `Hallo zusammen,
+
+Ich habe heute 30.04.2026 meine Kenntnisprüfung in Heidelberg bestanden – Alhamdulillah!
+
+Prüfungskommission: Radiologie, Chirurgie und Innere Medizin.
+
+Teil 1: Anamnese
+Patient: Herr Schmidt, 52 Jahre alt, stellte sich mit Polyurie, Polydipsie und Müdigkeit vor.
+Vorerkrankungen: Arterielle Hypertonie, Zustand nach Plattenosteosynthese.
+Ich führte eine gezielte körperliche Untersuchung durch:
+- Peripherer Pulsstatus
+- Zeichen diabetischer Polyneuropathie
+
+Teil 2: Patientenvorstellung
+Ich stellte den Fall strukturiert vor bis zur Diagnosestellung (Diabetes mellitus Typ 2).
+Fragen des Chirurgen:
+- Warum hat der Patient Wadenkrämpfe?
+- Klinische Zeichen einer TVT
+
+Teil 3: Fachgespräch
+Innere Medizin: Hyperthyreose – Morbus Basedow, Laborwerte, Therapie.
+Chirurgie: Appendizitis bei 18-jähriger Patientin – Sonographie, Therapie, laparoskopisch vs. konservativ.
+Radiologie: Strahlenschutz (ALARA-Prinzip), CT-Befunde, Lungenembolie.
+
+Die Prüfer waren sehr freundlich. Vielen Dank an alle, die ihre Protokolle geteilt haben!`,
+
+  fsp: `Ich habe heute die Fachsprachprüfung in Stuttgart bestanden! 22.03.2025
+
+Fall: Multiple Sklerose
+
+Patientin: Frau Gabriela Hubert, 34 Jahre alt.
+
+Aktuelle Beschwerden:
+- Kribbeln im linken Bein seit 3 Monaten
+- Koordinationsstörungen (geht manchmal schief)
+- Schlafstörungen wegen Sorgen
+
+Vorerkrankungen: keine
+Medikamente: Ibuprofen bei Bedarf
+Allergien: Meeresfrüchte (Angioödem)
+Noxen: Nikotin/Drogen verneint
+
+VD: Multiple Sklerose
+DD: Bandscheibenvorfall, Polyneuropathie, Hirntumor
+
+AAG-Fragen: MRT ZNS und WS, Liquorpunktion. Unterschied Hypästhesie vs. Parästhesie?
+
+Fachbegriffe: Demyelinisierung, Ataxie, Parästhesie, Spastik
+
+Kommission: 2 Ärzte, 1 Juristin — sehr freundlich.`
+};
+
+function loadExample() {
+  document.getElementById('inputText').value = EXAMPLES[mode];
+  // Reset suffix for KP
+  if (mode === 'kp') document.getElementById('kpSuffix').value = '';
+  setTimeout(autoDetect, 50);
+  showToast('📄 Beispiel geladen!');
+}
+
+// Auto-detect on paste
+document.getElementById('inputText').addEventListener('paste', () => setTimeout(autoDetect, 50));
+
+// Init
+setMode('kp');
+</script>
+</body>
+</html>
