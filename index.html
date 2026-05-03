@@ -65,6 +65,15 @@ a { text-decoration: none; }
   color: var(--text2); font-size: .88rem; font-weight: 500;
   transition: background .15s, color .15s;
 }
+.nav-links a.spenden-link {
+  background: var(--red);
+  color: #fff;
+  border: 1px solid transparent;
+}
+.nav-links a.spenden-link:hover {
+  background: #b8242d;
+  color: #fff;
+}
 .nav-links a:hover { background: var(--surface); color: var(--text); }
 .spacer { flex: 1; }
 .nav-badge {
@@ -156,6 +165,25 @@ a { text-decoration: none; }
   transition: background .15s;
 }
 .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+.donate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  background: linear-gradient(135deg, var(--red), #e04a54);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: .82rem 1.4rem;
+  border-radius: 999px;
+  box-shadow: 0 10px 26px rgba(200,48,58,.22);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.donate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(200,48,58,.28);
+  background: linear-gradient(135deg, #b8242d, var(--red));
+  color: #fff;
+}
 
 /* ─── SECTION ─── */
 .section { padding: 2.5rem 2.5rem; border-bottom: 1px solid var(--border); }
@@ -387,6 +415,8 @@ footer a:hover { color: var(--text); }
     <a href="#fsp">FSP-Protokolle</a>
     <a href="#statistik">Statistik</a>
     <a href="#tipps">Tipps</a>
+    <a href="Telc_B2_Vorbereitung%2010/indexb2.html">📚 TELC B2</a>
+    <a href="#spenden" class="spenden-link">💝 Spenden</a>
     <a href="krankenhaeuser.html">🏨 KH-Verzeichnis</a>
     <a href="protokoll_converter.html">🔧 Konverter</a>
     <a href="https://t.me/fspbadenwuttemberg" target="_blank">📬 Telegram</a>
@@ -402,7 +432,9 @@ footer a:hover { color: var(--text); }
   <a href="#kp"       onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">🏥 KP-Protokolle</a>
   <a href="#fsp"      onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">🗣️ FSP-Protokolle</a>
   <a href="#statistik" onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">📊 Statistik</a>
+  <a href="Telc_B2_Vorbereitung%2010/indexb2.html" onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">📚 TELC B2 Vorbereitung</a>
   <a href="#tipps"    onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">💡 Tipps</a>
+  <a href="#spenden" onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--red);border-bottom:1px solid var(--border);min-height:50px">💝 Spenden</a>
   <a href="krankenhaeuser.html" onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">🏨 KH-Verzeichnis</a>
   <a href="protokoll_converter.html" onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">🔧 Protokoll-Konverter</a>
   <a href="https://t.me/fspbadenwuttemberg" target="_blank" onclick="mobClose()" style="display:flex;align-items:center;gap:12px;padding:13px 1.3rem;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);min-height:50px">📬 Telegram-Gruppe</a>
@@ -458,14 +490,16 @@ window.addEventListener('resize',function(){if(window.innerWidth>900)mobClose();
   <div class="hero-eyebrow">Prüfungsprotokolle · KP & FSP · Baden-Württemberg</div>
   <h1>KP und FSP — bestehen mit den richtigen <em>Protokollen</em></h1>
   <p class="hero-desc">
-    Über 1.700 Erfahrungsberichte von Kolleginnen und Kollegen aus ganz Baden-Württemberg —
-    für die <strong>Kenntnisprüfung (KP)</strong> in sechs Städten und die
-    <strong>Fachsprachprüfung (FSP)</strong> in vier Städten.
-    Systematisch gesammelt, organisiert und frei zugänglich.
+    Dieses Projekt haben @oussdoc und @Linux62 gemeinsam aufgebaut.
+    Es unterstützt Kolleginnen und Kollegen auf dem Weg durch den Anerkennungsprozess in Deutschland —
+    von der B2-Vorbereitung bis zum Erhalt der Approbation.
+    Das Projekt ist kostenlos und bleibt kostenlos.
   </p>
   <div class="hero-actions">
     <a href="#kp" class="btn-primary">KP-Protokolle</a>
     <a href="#fsp" class="btn-primary" style="background:var(--purple);box-shadow:0 2px 14px rgba(124,58,237,.28)">FSP-Protokolle</a>
+    <a href="Telc_B2_Vorbereitung%2010/indexb2.html" class="btn-primary" style="background:var(--gold);box-shadow:0 2px 14px rgba(154,116,48,.28)">📚 TELC B2</a>
+    <a href="spenden.html" class="donate-btn">💝 Spenden</a>
     <a href="protokoll_converter.html" class="btn-ghost">🔧 Protokoll-Konverter</a>
     <a href="https://t.me/fspbadenwuttemberg" target="_blank" class="btn-ghost">📬 Telegram-Gruppe</a>
   </div>
@@ -936,6 +970,52 @@ window.addEventListener('resize',function(){if(window.innerWidth>900)mobClose();
   </div>
 </div>
 
+
+<!-- ═══ TELC B2 DIVIDER ═══ -->
+<div class="exam-divider">
+  <div class="exam-divider-line"></div>
+  <div class="exam-divider-label">📚 TELC Deutsch B2 · Prüfungsvorbereitung</div>
+  <div class="exam-divider-line"></div>
+</div>
+
+<!-- ═══ TELC B2 SECTION ═══ -->
+<div class="section reveal" id="telc">
+  <div class="section-head">
+    <h2>TELC Deutsch B2 <em>Vorbereitung</em></h2>
+    <span style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)">272 interaktive Übungen · Alle Prüfungsteile</span>
+  </div>
+  <a href="Telc_B2_Vorbereitung%2010/indexb2.html" class="kcard c-red reveal" style="max-width:680px;display:flex;flex-direction:column">
+    <div class="kcard-top">
+      <div class="kcard-icon" style="background:#fdf2f2;font-size:1.6rem">📚</div>
+      <div class="kcard-meta">
+        <div class="kcard-city">TELC Deutsch B2 · Vollständige Prüfungsvorbereitung</div>
+        <div class="kcard-title">TELC B2 Vorbereitung</div>
+        <div class="kcard-klinik">Lesen · Sprachbausteine · Hören · Schreiben</div>
+      </div>
+    </div>
+    <p class="kcard-desc">
+      272 interaktive Übungen für alle vier Teile der TELC Deutsch B2-Prüfung —
+      authentische Prüfungsaufgaben mit sofortiger Auswertung.
+      Komplett auf Deutsch, nach offiziellem TELC-Format strukturiert.
+    </p>
+    <div class="kcard-stats">
+      <div class="kstat"><span class="kstat-num" style="color:var(--red)">272</span><span class="kstat-lbl">Übungen</span></div>
+      <div class="kstat"><span class="kstat-num">4</span><span class="kstat-lbl">Prüfungsteile</span></div>
+      <div class="kstat"><span class="kstat-num">B2</span><span class="kstat-lbl">Niveau</span></div>
+    </div>
+    <div class="kcard-tags">
+      <span class="tag red">Lesen</span>
+      <span class="tag orange">Sprachbausteine</span>
+      <span class="tag blue">Hören</span>
+      <span class="tag purple">Schreiben</span>
+    </div>
+    <div class="kcard-arrow">
+      Zur TELC B2 Vorbereitung
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </a>
+</div>
+
 <!-- TIPS -->
 <div class="section" id="tipps">
   <div class="section-head reveal">
@@ -972,6 +1052,63 @@ window.addEventListener('resize',function(){if(window.innerWidth>900)mobClose();
       <div class="tip-box-icon">🤝</div>
       <div class="tip-box-title">Protokoll teilen!</div>
       <p>Nach der Prüfung unbedingt ein Protokoll schreiben und teilen — sowohl für KP als auch FSP. Besonders Reutlingen und Freiburg (FSP) brauchen mehr Berichte. Jeder Beitrag hilft!</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ DONATIONS ═══ -->
+<div class="exam-divider">
+  <div class="exam-divider-line"></div>
+  <div class="exam-divider-label">💝 Spenden</div>
+  <div class="exam-divider-line"></div>
+</div>
+
+<div class="section reveal" id="spenden">
+  <div class="section-head">
+    <h2>Spenden <em>Unterstützung</em></h2>
+    <span style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)">Frei zugänglich · Von Kolleginnen und Kollegen für Kolleginnen und Kollegen</span>
+  </div>
+  <div style="max-width:760px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.25rem;margin-bottom:1rem;color:var(--text2);line-height:1.8" class="reveal">
+    Dieses Projekt ist kostenlos und unterstützt Kolleginnen und Kollegen auf dem Weg durch den Anerkennungsprozess in Deutschland — von der B2-Vorbereitung bis zum Erhalt der Approbation.
+    Mein Ziel ist es, Inhalte verständlich, strukturiert und praxisnah aufzubereiten, damit der Einstieg ins deutsche Gesundheitssystem leichter gelingt.
+  </div>
+  <div class="cards-grid" style="grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:stretch">
+    <div class="kcard c-red reveal">
+      <div class="kcard-top">
+        <div class="kcard-icon" style="background:#fdf2f2">☕</div>
+        <div class="kcard-meta">
+          <div class="kcard-city">Buy me a coffee</div>
+          <div class="kcard-title">Unterstütze das Projekt</div>
+          <div class="kcard-klinik">Ein kleiner Beitrag hilft bei Hosting, Pflege und neuen Inhalten</div>
+        </div>
+      </div>
+      <p class="kcard-desc">
+        Wenn dir das Projekt beim Lernen oder im Anerkennungsprozess geholfen hat, kannst du mit einem Kaffee beitragen.
+        Jede Unterstützung hilft dabei, die Inhalte dauerhaft kostenlos und aktuell zu halten.
+      </p>
+      <div class="kcard-arrow">
+        <a href="https://www.buymeacoffee.com/oussdoc" target="_blank" rel="noopener noreferrer" style="color:inherit">☕ Buy me a coffee</a>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="kcard c-purple reveal" style="animation-delay:.06s">
+      <div class="kcard-top">
+        <div class="kcard-icon" style="background:#f5f3ff">👤</div>
+        <div class="kcard-meta">
+          <div class="kcard-city">Wer ich bin</div>
+          <div class="kcard-title">Über mich</div>
+          <div class="kcard-klinik">@oussdoc · Assistenzarzt in der Weiterbildung Innere Medizin</div>
+        </div>
+      </div>
+      <p class="kcard-desc">
+        Ich habe dieses Projekt ins Leben gerufen, um Kolleginnen und Kollegen auf ihrem Weg durch den Anerkennungsprozess in Deutschland zu unterstützen.
+        Mein Ziel ist es, komplexe Inhalte verständlich, strukturiert und praxisnah aufzubereiten.
+      </p>
+      <div class="kcard-arrow">
+        Danke für deine Unterstützung
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
     </div>
   </div>
 </div>
